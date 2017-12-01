@@ -1,2 +1,2 @@
 # RestClient-PHP
-PHP Restful Client for quick development
+Super Light Weight PHP Restful Client for quick development
