@@ -1,0 +1,8 @@
+{
+    "name": "RestClient",
+    "autoload": {
+        "psr-4": {
+            "RestClient\\": "RestClient/"
+        }
+    }
+}
