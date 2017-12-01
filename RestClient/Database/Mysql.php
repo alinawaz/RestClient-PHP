@@ -2,7 +2,7 @@
 
 namespace RestClient\Database;
 
-use RestClient\Config;
+use Config\Config;
 use RestClient\Database\MysqlTable;
 
 class Mysql {

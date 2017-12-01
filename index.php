@@ -2,15 +2,14 @@
 
 /* Required Files, Donot Changes Anything */
 require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/routes.php';
+require __DIR__ . '/Config/routes.php';
+require __DIR__ . '/RestClient/Helper.php';
 
 /* Error Handling, Request Routing, Donot Change Anything */
 function errorHanldingCallback($errno, $errstr, $errfile, $errline){
-    RestClient\Core\errorHandling::displaySystem($errno, $errstr, $errfile, $errline);
+    RestClient\errorHandling::displaySystem($errno, $errstr, $errfile, $errline);
 }
 
 set_error_handler("errorHanldingCallback");
 
-RestClient\Core\Route::run($_REQUEST['request']);
-
-/* Please open routes.php and explore Controllers to get started */
+RestClient\Router::run($_REQUEST['request']);

@@ -10,7 +10,8 @@ class MysqlTable {
     private static $queryBuilderString = '';
     private static $queryBuilderWhere = '';
     private static $queryBuilderAfterWhere = '';
-    private static $lastQuery='';
+    private static $lastQuery = '';
+    private static $joinTable = '';
 
     function __construct($tableNameString) {
         MysqlTable::$tableName = $tableNameString;
@@ -33,8 +34,38 @@ class MysqlTable {
       MysqlTable::$queryBuilderAfterWhere='';
     }
 
+    public function with($table,$joinType=''){
+        MysqlTable::$queryBuilderWhere .= " ".$joinType." ".$joinType." JOIN ".$table." ON ".$table.".".MysqlTable::$tableName."_id=".MysqlTable::$tableName.".id ";
+        return $this;
+    }
+
+    public function join($table,$joinType=''){
+        MysqlTable::$joinTable = $table;
+        MysqlTable::$queryBuilderWhere .= " ".$joinType." JOIN ".$table." ";
+        return $this;
+    }
+
+    public function on($arrayOrColumnName, $columnValue=NULL, $conditionType = 'AND'){
+      if(is_array($arrayOrColumnName)){
+        $whereString = '';
+        if ($arrayOrColumnName != null) {
+            foreach ($arrayOrColumnName as $key => $value) {
+                if ($whereString == "") {
+                    $whereString = $whereString . " " . MysqlTable::$joinTable . "." . $key . "=" . MysqlTable::$tableName . "." . $value . " ";
+                } else {
+                    $whereString = $whereString . " ".$conditionType." " .MysqlTable::$joinTable . "." . $key . "=" .MysqlTable::$tableName . "." . $value . " ";
+                }
+            }
+            MysqlTable::$queryBuilderWhere .= " ON ". $whereString;
+        }
+      }else{
+        MysqlTable::$queryBuilderWhere .= ' ON '. MysqlTable::$joinTable . "." . $arrayOrColumnName . "=" . MysqlTable::$tableName . "." . $columnValue . " ";
+      }
+      return $this;
+    }
+
     public function select($queryString){
-      MysqlTable::$queryBuilderString .= "SELECT ".$queryString." FROM ".MysqlTable::$tableName;
+      MysqlTable::$queryBuilderString = "SELECT ".$queryString." FROM ".MysqlTable::$tableName;
       return $this;
     }
 
@@ -114,6 +145,37 @@ class MysqlTable {
       return $this;
     }
 
+    public function orderBy($columns,$order = 'ASC'){
+        if(is_array($columns)){
+            $orders = '';
+            for ($i=0; $i < count($columns); $i++) { 
+                $orders .= ($orders==''?$columns[$i]:','.$columns[$i]);
+            }
+            MysqlTable::$queryBuilderWhere .= ' ORDER BY ' . $orders;
+        }else{
+            MysqlTable::$queryBuilderWhere .= ' ORDER BY ' . $columns . ' ' .$order;
+        }
+        return $this;
+    }
+
+    public function groupBy($columns){
+        if(is_array($columns)){
+            $groups = '';
+            for ($i=0; $i < count($columns); $i++) { 
+                $groups .= ($groups==''?$columns[$i]:','.$columns[$i]);
+            }
+            MysqlTable::$queryBuilderWhere .= ' GROUP BY ' . $groups;
+        }else{
+            MysqlTable::$queryBuilderWhere .= ' GROUP BY ' . $columns;
+        }
+        return $this;
+    }
+
+    public function limit($start,$length=NULL){
+        MysqlTable::$queryBuilderWhere .= ' LIMIT '.($length!=NULL?$start.",".$length:$start);
+        return $this;
+    }
+
     public static function exists() {
         $sql = DB::Query(MysqlTable::getQuery());
         if ($res = mysql_fetch_array($sql))
@@ -143,10 +205,12 @@ class MysqlTable {
       $record = array();
       if($sql)
         while ($data = mysqli_fetch_assoc($sql)) {
-            $record[] = $data;
+            $record[] = (object) $data;
         }
       MysqlTable::resetQueryBuilder();
-      return (object) $record;
+      if($record)
+        return $record;
+      return FALSE;
     }
 
     public static function first(){
@@ -157,7 +221,9 @@ class MysqlTable {
             $record = $data;
         }
       MysqlTable::resetQueryBuilder();
-      return (object) $record;
+      if($record)
+        return (object) $record;
+      return FALSE;
     }
 
     public static function insert($dataArray) {

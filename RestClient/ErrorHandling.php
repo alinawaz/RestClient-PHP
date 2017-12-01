@@ -1,6 +1,8 @@
 <?php
 
-namespace RestClient\Core;
+namespace RestClient;
+
+use Config\Config;
 
 class ErrorHandling {
 
@@ -23,14 +25,14 @@ class ErrorHandling {
     public static function displaySystem($errno, $errstr, $errfile, $errline) {
         $temp = debug_backtrace();
         $trace = '';
-        if (count(explode(\RestClient\Config::$baseUrl . '/', $errfile)) > 1)
-            $errfile = str_replace('/', '\\', explode(\RestClient\Config::$baseUrl . '/', $errfile)[1]);
+        if (count(explode(Config::$baseUrl . '/', $errfile)) > 1)
+            $errfile = str_replace('/', '\\', explode(Config::$baseUrl . '/', $errfile)[1]);
         $trace .='<p><i class="fa fa-bug" aria-hidden="true"></i> <b>' . $errfile . '</b> Line:' . $errline . '</p>';
         if ($temp) {
             foreach ($temp as $t) {
                 if (isset($t['file'])) {
-                    if (count(explode(\RestClient\Config::$baseUrl . '/', $t['file'])) > 1)
-                    $t['file'] = str_replace('/', '\\', explode(\RestClient\Config::$baseUrl . '/', $t['file'])[1]);
+                    if (count(explode(Config::$baseUrl . '/', $t['file'])) > 1)
+                    $t['file'] = str_replace('/', '\\', explode(Config::$baseUrl . '/', $t['file'])[1]);
                     if (!in_array($t['file'], self::$ignoreTraces))
                         $trace .='<p><i class="fa fa-bug" aria-hidden="true"></i> <b>' . $t['file'] . '</b> Line:' . $t['line'] . '</p>';
                 }
@@ -58,8 +60,8 @@ class ErrorHandling {
             $trace .='<p><i class="fa fa-comment-o" aria-hidden="true"></i> <b>' . $debugMessage . '</p>';
         foreach ($temp as $t) {
             if (isset($t['file'])) {
-                if (count(explode(\RestClient\Config::$baseUrl . '/', $t['file'])) > 1)
-                    $t['file'] = str_replace('/', '\\', explode(\RestClient\Config::$baseUrl . '/', $t['file'])[1]);
+                if (count(explode(Config::$baseUrl . '/', $t['file'])) > 1)
+                    $t['file'] = str_replace('/', '\\', explode(Config::$baseUrl . '/', $t['file'])[1]);
                 if (!self::isTraceIgnored($t['file']))
                     $trace .='<p><i class="fa fa-file-o" aria-hidden="true"></i> <b>' . $t['file'] . '</b> Line:' . $t['line'] . '</p>';
             }

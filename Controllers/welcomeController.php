@@ -2,13 +2,13 @@
 
 namespace Controllers;
 
-use RestClient\Core\Client as RC;
+use RestClient\Request;
 use RestClient\Database\Mysql as DB;
 
-class welcomeController extends RC {
+class welcomeController extends Request {
 
 	public function index(){
-		RC::toJson('Hello From PHP Rest Client 0.1v');
+		$this->response("Welcome to RestClient");					
 	}
 
 }

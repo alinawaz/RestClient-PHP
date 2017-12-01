@@ -1,14 +1,14 @@
 <?php
 
-namespace RestClient\Core;
+namespace RestClient;
 
-class Route extends ErrorHandling {
+class Router extends ErrorHandling {
 
     private static $routes = array();
     private static $params = array();
 
     public static function get($path, $target) {
-        Route::$routes[$path] = $target;
+        Router::$routes[$path] = $target;
     }
 
     public static function run($url) {

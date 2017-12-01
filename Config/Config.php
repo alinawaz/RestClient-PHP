@@ -1,10 +1,10 @@
 <?php
 
-namespace RestClient;
+namespace Config;
 
 Class Config {
 
-	public static $baseUrl = 'http://localhost/database_class';
+	public static $baseUrl = 'http://localhost/restclient';
 	public static $server = 'localhost';
 	public static $username = 'root';
 	public static $password = '';

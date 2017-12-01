@@ -3,7 +3,8 @@
     "autoload": {
         "psr-4": {
             "RestClient\\": "RestClient/",
-            "Controllers\\": "Controllers/"
+            "Controllers\\": "Controllers/",
+            "Config\\": "Config/"
         }
     }
 }
