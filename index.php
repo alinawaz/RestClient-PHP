@@ -2,19 +2,15 @@
 
 /* Required Files, Donot Changes Anything */
 require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/routes.php';
 
-/* RestClient Object to be used for rest services */
-use RestClient\RestClient;
-$rc = new RestClient();
+/* Error Handling, Request Routing, Donot Change Anything */
+function errorHanldingCallback($errno, $errstr, $errfile, $errline){
+    RestClient\Core\errorHandling::displaySystem($errno, $errstr, $errfile, $errline);
+}
 
-/* MySQL Object for database manipulation */
-use RestClient\Database\Mysql as DB;
+set_error_handler("errorHanldingCallback");
 
-// Your Code Starts Here, Please remove line below and get started ;)
-//$rc::toJson(Array('Hello World'));
+RestClient\Core\Route::run($_REQUEST['request']);
 
-$name = $rc::request('name');
-
-echo $name.', '.DB::table('users')->first()->first_name;
-
-
+/* Please open routes.php and explore Controllers to get started */

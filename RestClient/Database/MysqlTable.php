@@ -18,15 +18,15 @@ class MysqlTable {
         return $this;
     }
 
-    public function getLastQuery() {
+    public static function getLastQuery() {
       return MysqlTable::$lastQuery;
     }
 
-    private function getQuery(){
+    private static function getQuery(){
       return MysqlTable::$queryBuilderString.' '.MysqlTable::$queryBuilderWhere . ' ' . MysqlTable::$queryBuilderAfterWhere;
     }
 
-    private function resetQueryBuilder(){
+    private static function resetQueryBuilder(){
       MysqlTable::$lastQuery = MysqlTable::$queryBuilderString.' '.MysqlTable::$queryBuilderWhere . ' ' . MysqlTable::$queryBuilderAfterWhere;
       MysqlTable::$queryBuilderString='';
       MysqlTable::$queryBuilderWhere='';

@@ -1,8 +1,8 @@
 <?php
 
-namespace RestClient;
+namespace RestClient\Core;
 
-class RestClient {
+class Client {
 
 	public static function request($name, $callback=NULL){
 		if(isset($_REQUEST[$name])){
