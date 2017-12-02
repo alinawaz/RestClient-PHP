@@ -101,20 +101,29 @@ class Router extends ErrorHandling {
         $routes = self::parseRouteUrls();
         for ($i = 0; $i < count($routes['parsed']); $i++) {
             if (is_array($routes['parsed'][$i]) && is_array($parsedUrl)) {
-                $parsedDiscardedCount = self::getDiscardedCount($routes['parsed'][$i]);
-                if ((count($routes['parsed'][$i])-$parsedDiscardedCount) == count($parsedUrl)) {                    self::mapUrlBlocks($parsedUrl, $url, $routes['parsed'][$i], $routes['orignal'][$i], count($parsedUrl));
+                if (self::isRouteBalanced($routes['orignal'][$i],$url)) {
+                    self::mapUrlBlocks($parsedUrl, $url, $routes['parsed'][$i], $routes['orignal'][$i], count($parsedUrl));
                 }
-            }
+            }            
         }
     }
 
-    private static function getDiscardedCount($paramArray){
-        $count = 0;
-        for ($i=0; $i < count($paramArray); $i++) { 
-            if($paramArray[$i]=='{?}')
-                $count++;
+    private static function isRouteBalanced($givenUrl, $expectedUrl){
+        $given = explode('/',$givenUrl);
+        $expected = explode('/',$expectedUrl);
+        for ($i=0; $i < count($expected); $i++) {
+            if(!isset($given[$i])){
+                echo errorHandling::display(404);
+                exit;
+            }
+            if(match($given[$i],'{*}')){
+                // Ignore
+            }else{
+                if($expected[$i]!=$given[$i])
+                    return FALSE;
+            }
         }
-        return $count;
+        return TRUE;
     }
 
     private static function mapUrlBlocks($urlBlock, $urlBlockOrignal, $routeUrlBlock, $routeUrlBlockOrignal, $blockCount) {
@@ -124,7 +133,7 @@ class Router extends ErrorHandling {
             //echo "Checking optional for ".$routeUrlBlock[$i]." <br/>";
             if(self::checkOptionalParam($routeUrlBlock[$i])){
                 //echo "ADDED: ".$routeUrlBlock[$i].' = '.' '.'<br/>';
-                self::$params[$urlBlockOrignal]['OP'.$optionalParamNumber ] = '';
+                self::$params[$urlBlockOrignal]['OP'.$optionalParamNumber ] = (isset($urlBlock[$i])?$urlBlock[$i]:'');
                 self::$params[$urlBlockOrignal]['orignal'] = $routeUrlBlockOrignal;
                 $optionalParamNumber ++;
             }else{
