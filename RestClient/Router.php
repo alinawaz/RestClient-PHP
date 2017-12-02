@@ -66,12 +66,15 @@ class Router extends ErrorHandling {
 
     private static function handleString($url) {
         //var_dump(self::$routes[self::$params[$url]['orignal']]);
+        //d($url);
+        //dd(self::$params);
         //echo self::$routes[$url];
         $args = explode('@', self::chooseUrlProvider($url));
         if (count($args) > 1) {
             $controllerName = '\\Controllers\\' . $args[0];
             $methodName = $args[1];
             $controller = new $controllerName();
+            unset(self::$params[$url]['orignal']); //Fix: Removing undeed Params
             if (self::$params)
                 echo call_user_func_array(array($controller, $methodName), self::$params[$url]);
             if (!self::$params)
@@ -96,26 +99,50 @@ class Router extends ErrorHandling {
         $routes = self::parseRouteUrls();
         for ($i = 0; $i < count($routes['parsed']); $i++) {
             if (is_array($routes['parsed'][$i]) && is_array($parsedUrl)) {
-                if (count($routes['parsed'][$i]) == count($parsedUrl)) {
-                    self::mapUrlBlocks($parsedUrl, $url, $routes['parsed'][$i], $routes['orignal'][$i], count($parsedUrl));
+                $parsedDiscardedCount = self::getDiscardedCount($routes['parsed'][$i]);
+                if ((count($routes['parsed'][$i])-$parsedDiscardedCount) == count($parsedUrl)) {                    self::mapUrlBlocks($parsedUrl, $url, $routes['parsed'][$i], $routes['orignal'][$i], count($parsedUrl));
                 }
             }
         }
     }
 
+    private static function getDiscardedCount($paramArray){
+        $count = 0;
+        for ($i=0; $i < count($paramArray); $i++) { 
+            if($paramArray[$i]=='{?}')
+                $count++;
+        }
+        return $count;
+    }
+
     private static function mapUrlBlocks($urlBlock, $urlBlockOrignal, $routeUrlBlock, $routeUrlBlockOrignal, $blockCount) {
-        for ($i = 0; $i < $blockCount; $i++) {
-            //echo "URL: ".$urlBlock[$i]." == ".$routeUrlBlock[$i].(self::matchUrlBlock($urlBlock[$i], $routeUrlBlock[$i]) == 2?' => YES':' -- X').'<br/>';
-            if (self::matchUrlBlock($urlBlock[$i], $routeUrlBlock[$i]) == 2)
-            //echo "ADDED: ".$urlBlockOrignal.'<br/>';
+        $optionalParamNumber = 0;
+        for ($i = 0; $i < count($routeUrlBlock); $i++) {
+            /* Hanlding Optional Params */
+            //echo "Checking optional for ".$routeUrlBlock[$i]." <br/>";
+            if(self::checkOptionalParam($routeUrlBlock[$i])){
+                //echo "ADDED: ".$routeUrlBlock[$i].' = '.' '.'<br/>';
+                self::$params[$urlBlockOrignal]['OP'.$optionalParamNumber ] = '';
+                self::$params[$urlBlockOrignal]['orignal'] = $routeUrlBlockOrignal;
+                $optionalParamNumber ++;
+            }else{
+                /* Proper Matching */
                 if (self::matchUrlBlock($urlBlock[$i], $routeUrlBlock[$i]) == 2) {
+                    //echo "ADDED: ".$routeUrlBlock[$i].' = '.$urlBlock[$i].'<br/>';
                     self::$params[$urlBlockOrignal][$routeUrlBlock[$i]] = $urlBlock[$i];
                     self::$params[$urlBlockOrignal]['orignal'] = $routeUrlBlockOrignal;
                     //echo "Add Complete ... <br/>";
                 }
+            }
         }
 
         //var_dump(self::$params[$urlBlockOrignal]);echo '<br/>';
+    }
+
+    private static function checkOptionalParam($param){
+        if (strpos($param, '{?}') !== false)
+            return TRUE;
+        return FALSE;
     }
 
     private static function matchUrlBlock($urlBlock, $routeUrlBlock) {

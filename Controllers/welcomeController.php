@@ -11,4 +11,8 @@ class welcomeController extends Request {
 		$this->response("Welcome to RestClient");					
 	}
 
+	public function test($x,$y){
+		echo "X= ".$x.' Y='.$y;
+	}
+
 }
