@@ -2,6 +2,12 @@
 
 /* Helper Functions */
 
+$GLOBALS['current_route'] = '';
+
+function getRoute(){
+	return $GLOBALS['current_route'];
+}
+
 function contains($string, $findString){
 	if (strpos($string, $findString) !== false)
     	return TRUE;

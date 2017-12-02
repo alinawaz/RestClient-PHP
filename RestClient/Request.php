@@ -45,5 +45,13 @@ class Request {
 		echo json_encode($data);
 		exit;
 	}
+
+	public function getRoute(){
+		return getRoute();
+	}
+
+	public function getRouteArray(){
+		return explode('/',getRoute());
+	}
 	
 }

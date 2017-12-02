@@ -51,7 +51,8 @@ class Router extends ErrorHandling {
         $parameterizedCallbackOrSimpleCallback = (isset(self::$params[$url]['orignal'])?self::$routes[self::$params[$url]['orignal']]:self::$routes[$url]);
         if (is_callable($parameterizedCallbackOrSimpleCallback)) {
             $func = $parameterizedCallbackOrSimpleCallback;
-            unset(self::$params[$url]['orignal']);
+            $GLOBALS['current_route'] = $url;
+            unset(self::$params[$url]['orignal']);            
             if(isset(self::$params[$url])){
                 echo call_user_func_array($func, self::$params[$url]);
             }else{
@@ -74,6 +75,7 @@ class Router extends ErrorHandling {
             $controllerName = '\\Controllers\\' . $args[0];
             $methodName = $args[1];
             $controller = new $controllerName();
+            $GLOBALS['current_route'] = $url;
             unset(self::$params[$url]['orignal']); //Fix: Removing undeed Params
             if (self::$params)
                 echo call_user_func_array(array($controller, $methodName), self::$params[$url]);
