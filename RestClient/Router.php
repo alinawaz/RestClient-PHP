@@ -48,10 +48,15 @@ class Router extends ErrorHandling {
     }
 
     private static function handleCallback($url) {
-        if (is_callable(self::$routes[self::$params[$url]['orignal']])) {
-            $func = self::$routes[self::$params[$url]['orignal']];
+        $parameterizedCallbackOrSimpleCallback = (isset(self::$params[$url]['orignal'])?self::$routes[self::$params[$url]['orignal']]:self::$routes[$url]);
+        if (is_callable($parameterizedCallbackOrSimpleCallback)) {
+            $func = $parameterizedCallbackOrSimpleCallback;
             unset(self::$params[$url]['orignal']);
-            echo call_user_func_array($func, self::$params[$url]);
+            if(isset(self::$params[$url])){
+                echo call_user_func_array($func, self::$params[$url]);
+            }else{
+                echo call_user_func_array($func,Array());
+            }
             exit;
         } else {
             echo errorHandling::display(404);
