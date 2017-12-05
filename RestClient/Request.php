@@ -2,6 +2,8 @@
 
 namespace RestClient;
 
+use Config\Config;
+
 class Request {
 
 	public function block($request,$message='Request Not Allowed'){
@@ -53,5 +55,68 @@ class Request {
 	public function getRouteArray(){
 		return explode('/',getRoute());
 	}
+
+	public static function view($viewFile, $data = null, $viewFileAsString = FALSE) {
+		$output = '';
+		if($viewFileAsString){
+			$output = $viewFile;
+			if ($data != null) {
+	            foreach ($data as $var => $val) {
+	                $$var = $val;
+	            }
+	        }
+		}else{
+	        $actualFile = Config::$viewFolder . '/' . $viewFile . ".php";
+	        if ($data != null) {
+	            foreach ($data as $var => $val) {
+	                $$var = $val;
+	            }
+	        }
+	        ob_start();
+	        include_once $actualFile;
+	        $output = ob_get_clean();
+		}
+        $includes = match($output,'*@include(?)*',TRUE);
+        $phpShortEchos = match($output,'*{{?}}*',TRUE);
+        $phpShortCodes = match($output,'*{!?!}*',TRUE);
+        $phpIf = match($output,'*@if(?)?@endif',TRUE);
+        
+        $output = str_replace("~", Config::$baseUrl . '/Assets/', $output);
+        $output = str_replace("url:", Config::$baseUrl ."/", $output);
+        if(is_array($includes))
+	        foreach($includes as $inc){
+	        	$output = str_replace("@include(".$inc.")", self::view($inc,$data), $output);
+	        }
+	    if(is_array($phpShortCodes))
+	        foreach($phpShortCodes as $psc){
+	        	ob_start();
+				eval($psc);
+				$results = ob_get_contents();
+				ob_end_clean();
+	        	$output = str_replace("{!".$psc."!}", $results, $output);
+	        }
+	    if(is_array($phpIf))
+	        for($i=0;$i<count($phpIf);$i++){
+	        	$temp = $phpIf[$i];
+	        	$code = "if( ".$phpIf[$i]." ){ ";
+	        	$i++;
+	        	$code = $code . '?>' . self::view($phpIf[$i] . '<?php ',$data,TRUE)." }";
+	        	ob_start();
+				eval($code);
+				$results = ob_get_contents();
+				ob_end_clean();
+	        	$output = str_replace("@if(".$temp.")".$phpIf[$i]."@endif", $results, $output);
+	        }    
+	    if(is_array($phpShortEchos))
+	        foreach($phpShortEchos as $pse){
+	        	$code = 'echo '.$pse.';';
+	        	ob_start();
+				eval($code);
+				$results = ob_get_contents();
+				ob_end_clean();
+	        	$output = str_replace("{{".$pse."}}", $results, $output);
+	        }	    
+        return $output;
+    }
 	
 }

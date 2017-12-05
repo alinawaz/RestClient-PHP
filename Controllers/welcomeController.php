@@ -11,4 +11,8 @@ class welcomeController extends Request {
 		$this->response("Welcome to RestClient");					
 	}
 
+	public function test(){
+		return $this->view('test',array('name'=>'Ali','count' => 10));
+	}
+
 }

@@ -14,29 +14,93 @@ $GLOBALS['current_route'] = '';
   	return FALSE;
  }
 
- function match($string, $condition){
+ function match($string, $condition, $recursive = FALSE){
+ 	$gotStrings = Array();
+ 	$gotCount = -1;
+ 	if(strlen($condition)<1)
+ 		return FALSE;
  	$index = 0;
  	$findNext = $condition[$index];
  	$expecting = 'exact_match';
- 	for ($i=0; $i < strlen($string); $i++) { 
+ 	if($findNext=='*'){
+ 		$expecting = 'anything';
+ 		if(isset($condition[$index+1]))
+ 			$findNext = $condition[++$index];
+ 	}
+ 	if($findNext=='?'){
+ 		$gotCount++;
+ 		$gotStrings[$gotCount] = '';
+ 		$expecting = 'get';
+ 		if(isset($condition[$index+1])){
+ 			$findNext = $condition[++$index];
+ 		}elseif ($recursive){
+ 			$index = 0;
+ 			$findNext = $condition[$index];
+ 		}
+ 	}
+ 	for ($i=0; $i < strlen($string); $i++) {  		
  		$char = $string[$i];
- 		//d("Finding: ".$findNext.' for '.$char);
+ 		//echo "FN: ".$findNext." ACTUAL: ".$char."<br/>";
+ 		if($expecting=='get' && $findNext != $char){
+ 			$gotStrings[$gotCount] = $gotStrings[$gotCount] . $char;
+ 		}
  		if($findNext == $char){
  			$expecting = 'exact_match';
  			if(isset($condition[$index+1]) && $i < strlen($string) -1){
  				$findNext = $condition[++$index];
+ 			}elseif ($recursive){
+ 				$index = 0;
+ 				$findNext = $condition[$index];
  			}
  			if($findNext=='*'){
  				$expecting = 'anything';
- 				$findNext = $condition[++$index];
+ 				if(isset($condition[$index+1])){
+ 					$findNext = $condition[++$index];
+ 				}elseif ($recursive){
+ 					$index = 0;
+ 					$findNext = $condition[$index];
+ 					if($findNext=='*'){
+				 		$expecting = 'anything';
+				 		if(isset($condition[$index+1]))
+				 			$findNext = $condition[++$index];
+				 	}
+ 				}
  			}
+ 			if($findNext=='?'){
+		 		$gotCount++;
+		 		$gotStrings[$gotCount] = '';
+		 		$expecting = 'get';
+		 		if(isset($condition[$index+1])){
+		 			$findNext = $condition[++$index];
+		 		}elseif ($recursive){
+ 					$index = 0;
+ 					$findNext = $condition[$index];
+ 				}
+		 	}
  		}else{
- 			if($expecting == 'exact_match')
+ 			if($expecting == 'exact_match' && !$recursive)
  				return FALSE;
+ 			if($expecting == 'exact_match' && $recursive)
+ 				if(isset($gotStrings[$gotCount])){
+ 					$index = 0;
+ 					$findNext = $condition[$index];
+ 					if($findNext=='*'){
+				 		$expecting = 'anything';
+				 		if(isset($condition[$index+1]))
+				 			$findNext = $condition[++$index];
+				 	}
+ 				}
+
  		}
  	}
- 	if($index == strlen($condition)-1)
+
+ 	if(count($gotStrings)>0 && $recursive)
+ 			return $gotStrings;
+ 	if($index == strlen($condition)-1){
+ 		if(count($gotStrings)>0)
+ 			return $gotStrings;
  		return TRUE;
+ 	}
  	return FALSE;
  }
 
