@@ -56,7 +56,7 @@ class Request {
 		return explode('/',getRoute());
 	}
 
-	public static function view($viewFile, $data = null, $viewFileAsString = FALSE) {
+	public static function view($viewFile, $data = null, $viewFileAsString = FALSE, $ignoreVars = Array()) {
 		$output = '';
 		if($viewFileAsString){
 			$output = $viewFile;
@@ -80,6 +80,7 @@ class Request {
         $phpShortEchos = match($output,'*{{?}}*',TRUE);
         $phpShortCodes = match($output,'*{!?!}*',TRUE);
         $phpIf = match($output,'*@if(?)?@endif',TRUE);
+        $phpFor = match($output,'*@for($?=?;?)?@endfor',TRUE);
         
         $output = str_replace("~", Config::$baseUrl . '/Assets/', $output);
         $output = str_replace("url:", Config::$baseUrl ."/", $output);
@@ -106,10 +107,33 @@ class Request {
 				$results = ob_get_contents();
 				ob_end_clean();
 	        	$output = str_replace("@if(".$temp.")".$phpIf[$i]."@endif", $results, $output);
-	        }    
+	        }
+	    if(is_array($phpFor))
+	        for($__i=0;$__i<count($phpFor);$__i++){
+	        	$var_name = $phpFor[$__i];
+	        	$__i++;
+	        	$var_value = $phpFor[$__i];
+	        	$__i++;
+	        	$conditions = $phpFor[$__i];
+	        	$temp = '$'.$var_name.'='.$var_value.';'.$conditions;
+	        	$code = "for( ".$temp." ){ ";
+	        	$__i++;
+	        	$code = $code . '?>' . self::view($phpFor[$__i] . '<?php ',$data,TRUE,Array('$i'))." }";
+	        	ob_start();
+				eval($code);
+				$results = ob_get_contents();
+				ob_end_clean();
+	        	$output = str_replace("@for(".$temp.")".$phpFor[$__i]."@endfor", $results, $output);
+	        }      
 	    if(is_array($phpShortEchos))
 	        foreach($phpShortEchos as $pse){
 	        	$code = 'echo '.$pse.';';
+	        	if(count($ignoreVars)>0){
+	        		if(in_array($pse, $ignoreVars)){
+	        			$output = str_replace("{{".$pse."}}", '<?php echo '.$pse.'; ?>', $output);
+	        			continue;
+	        		}
+	        	}	        	
 	        	ob_start();
 				eval($code);
 				$results = ob_get_contents();

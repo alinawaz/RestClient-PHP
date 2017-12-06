@@ -40,7 +40,7 @@ $GLOBALS['current_route'] = '';
  	}
  	for ($i=0; $i < strlen($string); $i++) {  		
  		$char = $string[$i];
- 		//echo "FN: ".$findNext." ACTUAL: ".$char."<br/>";
+ 		//echo "FN: ".$findNext." ACTUAL: ".$char." --exp ".$expecting."<br/>";
  		if($expecting=='get' && $findNext != $char){
  			$gotStrings[$gotCount] = $gotStrings[$gotCount] . $char;
  		}
@@ -81,7 +81,7 @@ $GLOBALS['current_route'] = '';
  			if($expecting == 'exact_match' && !$recursive)
  				return FALSE;
  			if($expecting == 'exact_match' && $recursive)
- 				if(isset($gotStrings[$gotCount])){
+ 				//if(isset($gotStrings[$gotCount])){
  					$index = 0;
  					$findNext = $condition[$index];
  					if($findNext=='*'){
@@ -89,7 +89,7 @@ $GLOBALS['current_route'] = '';
 				 		if(isset($condition[$index+1]))
 				 			$findNext = $condition[++$index];
 				 	}
- 				}
+ 				//}
 
  		}
  	}
