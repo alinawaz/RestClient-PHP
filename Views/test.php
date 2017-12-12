@@ -8,7 +8,9 @@
 
 		<ul>
 		@for($i=1;$i<=$count;$i++)
-			<li>{{$i}}</li>
+			@if($i!=5)
+				<li>{{$i}}</li>
+			@endif
 		@endfor
 		</ul>
 

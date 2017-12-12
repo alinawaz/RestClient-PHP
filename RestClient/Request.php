@@ -56,91 +56,77 @@ class Request {
 		return explode('/',getRoute());
 	}
 
-	public static function view($viewFile, $data = null, $viewFileAsString = FALSE, $ignoreVars = Array()) {
+	public static function view($viewFile, $data = null, $renderable = true) {
 		$output = '';
-		if($viewFileAsString){
-			$output = $viewFile;
-			if ($data != null) {
-	            foreach ($data as $var => $val) {
-	                $$var = $val;
-	            }
-	        }
-		}else{
-	        $actualFile = Config::$viewFolder . '/' . $viewFile . ".php";
-	        if ($data != null) {
-	            foreach ($data as $var => $val) {
-	                $$var = $val;
-	            }
-	        }
-	        ob_start();
-	        include_once $actualFile;
-	        $output = ob_get_clean();
+
+		$actualFile = Config::$viewFolder . '/' . $viewFile . ".php";
+		ob_start();
+		include_once $actualFile;
+		$output = ob_get_clean();
+
+		// Passed Data Declaration
+		if ($data != null) {
+			$vars = '<?php ';
+			foreach ($data as $var => $val) {
+				if(is_string($val))
+					$val = '"'.$val.'"';
+				$vars = $vars . ' $'.$var.'='.$val.'; ';
+			}
+			$vars = $vars . ' ?> ';
+			$output = $vars . $output;
 		}
+
         $includes = match($output,'*@include(?)*',TRUE);
         $phpShortEchos = match($output,'*{{?}}*',TRUE);
-        $phpShortCodes = match($output,'*{!?!}*',TRUE);
-        $phpIf = match($output,'*@if(?)?@endif',TRUE);
-        $phpFor = match($output,'*@for($?=?;?)?@endfor',TRUE);
+		$phpIf = match($output,'*@if(?)',TRUE);
+		$phpFor = match($output,'*@for(?)',TRUE);
+		$phpForEach = match($output,'*@foreach(?)',TRUE);
         
         $output = str_replace("~", Config::$baseUrl . '/Assets/', $output);
         $output = str_replace("url:", Config::$baseUrl ."/", $output);
         if(is_array($includes))
 	        foreach($includes as $inc){
-	        	$output = str_replace("@include(".$inc.")", self::view($inc,$data), $output);
-	        }
-	    if(is_array($phpShortCodes))
-	        foreach($phpShortCodes as $psc){
-	        	ob_start();
-				eval($psc);
-				$results = ob_get_contents();
-				ob_end_clean();
-	        	$output = str_replace("{!".$psc."!}", $results, $output);
+	        	$output = str_replace("@include(".$inc.")", self::view($inc,null,false), $output);
 	        }
 	    if(is_array($phpIf))
 	        for($i=0;$i<count($phpIf);$i++){
 	        	$temp = $phpIf[$i];
-	        	$code = "if( ".$phpIf[$i]." ){ ";
-	        	$i++;
-	        	$code = $code . '?>' . self::view($phpIf[$i] . '<?php ',$data,TRUE)." }";
-	        	ob_start();
-				eval($code);
-				$results = ob_get_contents();
-				ob_end_clean();
-	        	$output = str_replace("@if(".$temp.")".$phpIf[$i]."@endif", $results, $output);
-	        }
-	    if(is_array($phpFor))
-	        for($__i=0;$__i<count($phpFor);$__i++){
-	        	$var_name = $phpFor[$__i];
-	        	$__i++;
-	        	$var_value = $phpFor[$__i];
-	        	$__i++;
-	        	$conditions = $phpFor[$__i];
-	        	$temp = '$'.$var_name.'='.$var_value.';'.$conditions;
-	        	$code = "for( ".$temp." ){ ";
-	        	$__i++;
-	        	$code = $code . '?>' . self::view($phpFor[$__i] . '<?php ',$data,TRUE,Array('$i'))." }";
-	        	ob_start();
-				eval($code);
-				$results = ob_get_contents();
-				ob_end_clean();
-	        	$output = str_replace("@for(".$temp.")".$phpFor[$__i]."@endfor", $results, $output);
-	        }      
+	        	$output = str_replace("@if(".$temp.")", "<?php if(".$temp."){ ?>", $output);
+			}
+		if(is_array($phpFor))
+	        for($i=0;$i<count($phpFor);$i++){
+	        	$temp = $phpFor[$i];
+	        	$output = str_replace("@for(".$temp.")", "<?php for(".$temp."){ ?>", $output);
+			} 
+		if(is_array($phpForEach))
+	        for($i=0;$i<count($phpForEach);$i++){
+	        	$temp = $phpForEach[$i];
+	        	$output = str_replace("@foreach(".$temp.")", "<?php foreach(".$temp."){ ?>", $output);
+			}      
 	    if(is_array($phpShortEchos))
 	        foreach($phpShortEchos as $pse){
-	        	$code = 'echo '.$pse.';';
-	        	if(count($ignoreVars)>0){
-	        		if(in_array($pse, $ignoreVars)){
-	        			$output = str_replace("{{".$pse."}}", '<?php echo '.$pse.'; ?>', $output);
-	        			continue;
-	        		}
-	        	}	        	
-	        	ob_start();
-				eval($code);
-				$results = ob_get_contents();
-				ob_end_clean();
-	        	$output = str_replace("{{".$pse."}}", $results, $output);
-	        }	    
-        return $output;
-    }
+	        	$code = '<?php echo '.$pse.'; ?>';
+	        	$output = str_replace("{{".$pse."}}", $code, $output);
+			}
+		// Few Replacements
+		$output = str_replace("@endif", '<?php } ?>', $output);
+		$output = str_replace("@endfor", '<?php } ?>', $output);
+		$output = str_replace("@endforeach", '<?php } ?>', $output);
+		$output = str_replace("@php", '<?php ', $output);
+		$output = str_replace("@endphp", ' ?>', $output);
+
+		if(!$renderable)
+			return $output;
+		self::renderViewtoFile($viewFile,$output);
+	}
+	
+	private static function renderViewtoFile($viewFile,$output){
+		$actualFile = 'Storage/temp/views/' . $viewFile . "~temp.php";
+		$file = fopen($actualFile ,"w");
+		fwrite($file,$output);
+		fclose($file);
+		include_once $actualFile;
+		return null;
+	}
 	
 }

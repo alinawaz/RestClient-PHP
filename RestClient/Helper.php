@@ -19,7 +19,8 @@ $GLOBALS['current_route'] = '';
  	$gotCount = -1;
  	if(strlen($condition)<1)
  		return FALSE;
- 	$index = 0;
+	$index = 0;
+	$resetPoint = 0;
  	$findNext = $condition[$index];
  	$expecting = 'exact_match';
  	if($findNext=='*'){
@@ -30,8 +31,9 @@ $GLOBALS['current_route'] = '';
  	if($findNext=='?'){
  		$gotCount++;
  		$gotStrings[$gotCount] = '';
- 		$expecting = 'get';
+		$expecting = 'get';		
  		if(isset($condition[$index+1])){
+			$resetPoint = $index+1;
  			$findNext = $condition[++$index];
  		}elseif ($recursive){
  			$index = 0;
@@ -40,7 +42,7 @@ $GLOBALS['current_route'] = '';
  	}
  	for ($i=0; $i < strlen($string); $i++) {  		
  		$char = $string[$i];
- 		//echo "FN: ".$findNext." ACTUAL: ".$char." --exp ".$expecting."<br/>";
+ 		//echo "FN: ".$findNext." ACTUAL: ".$char." --exp ".$expecting." ".($findNext==$char?'<i style="color: green">MATCHED</i>':'')."<br/>";
  		if($expecting=='get' && $findNext != $char){
  			$gotStrings[$gotCount] = $gotStrings[$gotCount] . $char;
  		}
@@ -71,6 +73,7 @@ $GLOBALS['current_route'] = '';
 		 		$gotStrings[$gotCount] = '';
 		 		$expecting = 'get';
 		 		if(isset($condition[$index+1])){
+					$resetPoint = $index+1;
 		 			$findNext = $condition[++$index];
 		 		}elseif ($recursive){
  					$index = 0;
@@ -80,16 +83,15 @@ $GLOBALS['current_route'] = '';
  		}else{
  			if($expecting == 'exact_match' && !$recursive)
  				return FALSE;
- 			if($expecting == 'exact_match' && $recursive)
- 				//if(isset($gotStrings[$gotCount])){
- 					$index = 0;
+ 			if($expecting == 'exact_match' && $recursive){
+ 					$index = $resetPoint;
  					$findNext = $condition[$index];
  					if($findNext=='*'){
 				 		$expecting = 'anything';
 				 		if(isset($condition[$index+1]))
 				 			$findNext = $condition[++$index];
 				 	}
- 				//}
+ 				}
 
  		}
  	}

@@ -11,8 +11,9 @@ class welcomeController extends Request {
 		$this->response("Welcome to RestClient");					
 	}
 
+	// Enjoy Views & Templating Engine ;)
 	public function test(){
-		return $this->view('test',array('name'=>'Ali','count' => 10));
+		return $this->view('test',array('name'=>'Ali','count' => 12));
 	}
 
 }
