@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 /* Helper Functions */
 
 $GLOBALS['current_route'] = '';
@@ -12,6 +14,14 @@ $GLOBALS['current_route'] = '';
 	if (strpos($string, $findString) !== false)
     	return TRUE;
   	return FALSE;
+ }
+
+ function session($name,$value=null){
+	if($value==null){
+		return (isset($_SESSION[$name])?$_SESSION[$name]:'');
+	}else{
+		$_SESSION[$name] = $value;
+	}
  }
 
  function match($string, $condition, $recursive = FALSE){

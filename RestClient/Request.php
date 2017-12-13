@@ -42,6 +42,10 @@ class Request {
 		header('Location: '.$url);
 	}
 
+	public function redirectBack(){
+		header('Location: ' . $_SERVER['HTTP_REFERER']);
+	}
+
 	public function response($data){
 		header('Content-Type: application/json');
 		echo json_encode($data);
@@ -134,6 +138,9 @@ class Request {
 	}
 	
 	private static function renderViewtoFile($viewFile,$output){
+		// Includings by default
+		$output = '<?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?>' . $output;
+		// Outputting into file
 		$actualFile = 'Storage/temp/views/' . $viewFile . "~temp.php";
 		$file = fopen($actualFile ,"w");
 		fwrite($file,$output);

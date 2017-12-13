@@ -4,11 +4,20 @@ namespace Controllers;
 
 use RestClient\Request;
 use RestClient\Database\Mysql as DB;
+use RestClient\Libs\Lang;
 
 class welcomeController extends Request {
 
 	public function index(){
-		$this->view('welcome');				
+		Lang::setLanguage((Lang::getLanguage()?Lang::getLanguage():'english'));
+		$this->view('welcome',Array(
+			'language' => Lang::getLanguage()
+		));				
+	}
+
+	public function switchLanguage($language){
+		Lang::setLanguage($language);
+		$this->redirectBack();
 	}
 
 }
