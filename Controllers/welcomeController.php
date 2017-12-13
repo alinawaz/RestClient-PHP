@@ -13,7 +13,7 @@ class welcomeController extends Request {
 
 	// Enjoy Views & Templating Engine ;)
 	public function test(){
-		return $this->view('test',array('name'=>'Ali','count' => 12));
+		$this->view('test',array('name'=>'Ali','count' => 12));
 	}
 
 }
