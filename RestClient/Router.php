@@ -11,6 +11,10 @@ class Router extends ErrorHandling {
         Router::$routes[$path] = $target;
     }
 
+    public static function includeRoute($routeFileName){
+        require 'Config/'.$routeFileName.'.php';
+    }
+
     public static function run($url) {
         if (self::isRoute($url)) {
             if (self::isString($url)) {
