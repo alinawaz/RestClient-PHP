@@ -11,7 +11,7 @@ class Router extends ErrorHandling {
         Router::$routes[$path] = $target;
     }
 
-    public static function includeRoute($routeFileName){
+    public static function extend($routeFileName){
         require 'Config/'.$routeFileName.'.php';
     }
 

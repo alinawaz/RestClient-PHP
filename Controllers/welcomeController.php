@@ -10,7 +10,7 @@ class welcomeController extends Request {
 
 	public function index(){
 		Lang::setLanguage((Lang::getLanguage()?Lang::getLanguage():'english'));
-		$this->view('welcome',Array(
+		return $this->view('welcome',Array(
 			'language' => Lang::getLanguage()
 		));				
 	}

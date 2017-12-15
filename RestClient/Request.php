@@ -66,19 +66,7 @@ class Request {
 		$actualFile = Config::$viewFolder . '/' . $viewFile . ".php";
 		ob_start();
 		include_once $actualFile;
-		$output = ob_get_clean();
-
-		// Passed Data Declaration
-		if ($data != null) {
-			$vars = '<?php ';
-			foreach ($data as $var => $val) {
-				if(is_string($val))
-					$val = '"'.$val.'"';
-				$vars = $vars . ' $'.$var.'='.$val.'; ';
-			}
-			$vars = $vars . ' ?> ';
-			$output = $vars . $output;
-		}
+		$output = ob_get_clean();		
 
         $includes = match($output,'*@include(?)*',TRUE);
         $phpShortEchos = match($output,'*{{?}}*',TRUE);
@@ -126,27 +114,41 @@ class Request {
 		}
 		// Few Replacements
 		$output = str_replace("@endif", '<?php } ?>', $output);
-		$output = str_replace("@endfor", '<?php } ?>', $output);
-		$output = str_replace("@else", '<?php }else{ ?>', $output);
 		$output = str_replace("@endforeach", '<?php } ?>', $output);
+		$output = str_replace("@endfor", '<?php } ?>', $output);
+		$output = str_replace("@else", '<?php }else{ ?>', $output);		
 		$output = str_replace("@php", '<?php ', $output);
 		$output = str_replace("@endphp", ' ?>', $output);
 
 		if(!$renderable)
 			return $output;
-		self::renderViewtoFile($viewFile,$output);
+		return self::loadViewFromCache($viewFile,$output,$data);
 	}
-	
-	private static function renderViewtoFile($viewFile,$output){
-		// Includings by default
-		$output = '<?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?>' . $output;
-		// Outputting into file
-		$actualFile = 'Storage/temp/views/' . $viewFile . "~temp.php";
+
+	private static function renderViewToFile($actualFile,$output){
 		$file = fopen($actualFile ,"w");
 		fwrite($file,$output);
 		fclose($file);
+	}
+	
+	private static function loadViewFromCache($viewFile,$output,$data){
+		// Includings by default
+		$output = '<?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?>' . $output;
+		// Passed Data Declaration
+		if ($data != null) {
+			foreach ($data as $var => $val) {
+				$$var = $val;
+			}
+		}
+		// Outputting into file
+		$actualFile = 'Storage/temp/views/' . $viewFile . "~temp.php";
+		// Re-rendering view
+		self::renderViewToFile($actualFile,$output);
+		// Grabing Content from cache	
+		ob_start();
 		include_once $actualFile;
-		return null;
+		$output = ob_get_clean();
+		return $output;
 	}
 	
 }

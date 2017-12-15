@@ -1,4 +1,4 @@
-<?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?><?php  $language="english";  ?> <html>
+<?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?><html>
   <head>
     <title>Welcome</title>
     <link href="http://localhost/restclient/Assets/bootstrap.css" rel="stylesheet"/>

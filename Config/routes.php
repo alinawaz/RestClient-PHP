@@ -8,4 +8,4 @@ use RestClient\Router as router;
 router::get('', 'welcomeController@index');
 
 /* Extending Routes */
-router::includeRoute('welcomeRoutes');
+router::extend('welcomeRoutes');

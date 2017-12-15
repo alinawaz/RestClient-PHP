@@ -15,6 +15,8 @@ class ErrorHandling {
 
     public static function display($code) {
         switch ($code) {
+            case 100:
+                self::throwError("Requested Method Not Allowed", false);
             case 404:
                 self::throwError("Requested Resource Not Found", false);
             default:
