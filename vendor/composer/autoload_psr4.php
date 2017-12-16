@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'RestClient\\' => array($baseDir . '/RestClient'),
+    'Models\\' => array($baseDir . '/Models'),
     'Controllers\\' => array($baseDir . '/Controllers'),
     'Config\\' => array($baseDir . '/Config'),
 );

@@ -93,6 +93,9 @@ class Router extends ErrorHandling {
     }
 
     private static function chooseUrlProvider($url) {
+        //d(self::$params);
+        //d($url);
+        //dd(self::$params[$url]['orignal']);
         return (self::$params ? self::$routes[self::$params[$url]['orignal']] : self::$routes[$url]);
     }
 
@@ -116,15 +119,13 @@ class Router extends ErrorHandling {
         $given = explode('/',$givenUrl);
         $expected = explode('/',$expectedUrl);
         for ($i=0; $i < count($expected); $i++) {
-            if(!isset($given[$i])){
-                echo errorHandling::display(404);
-                exit;
-            }
-            if(match($given[$i],'{*}')){
-                // Ignore
-            }else{
-                if($expected[$i]!=$given[$i])
-                    return FALSE;
+            if(isset($given[$i])){
+                if(match($given[$i],'{*}')){
+                    // Ignore
+                }else{
+                    if($expected[$i]!=$given[$i])
+                        return FALSE;
+                }
             }
         }
         return TRUE;
@@ -132,21 +133,24 @@ class Router extends ErrorHandling {
 
     private static function mapUrlBlocks($urlBlock, $urlBlockOrignal, $routeUrlBlock, $routeUrlBlockOrignal, $blockCount) {
         $optionalParamNumber = 0;
-        for ($i = 0; $i < count($routeUrlBlock); $i++) {
-            /* Hanlding Optional Params */
-            //echo "Checking optional for ".$routeUrlBlock[$i]." <br/>";
-            if(self::checkOptionalParam($routeUrlBlock[$i])){
-                //echo "ADDED: ".$routeUrlBlock[$i].' = '.' '.'<br/>';
-                self::$params[$urlBlockOrignal]['OP'.$optionalParamNumber ] = (isset($urlBlock[$i])?$urlBlock[$i]:'');
-                self::$params[$urlBlockOrignal]['orignal'] = $routeUrlBlockOrignal;
-                $optionalParamNumber ++;
-            }else{
-                /* Proper Matching */
-                if (self::matchUrlBlock($urlBlock[$i], $routeUrlBlock[$i]) == 2) {
-                    //echo "ADDED: ".$routeUrlBlock[$i].' = '.$urlBlock[$i].'<br/>';
-                    self::$params[$urlBlockOrignal][$routeUrlBlock[$i]] = $urlBlock[$i];
+        if(count($urlBlock)==count($routeUrlBlock)){ // Fix: Parsing Matching
+            for ($i = 0; $i < count($routeUrlBlock); $i++) {
+                /* Hanlding Optional Params */
+                //echo "Checking optional for ".$routeUrlBlock[$i]." <br/>";
+                if(self::checkOptionalParam($routeUrlBlock[$i])){
+                    //echo "ADDED: ".$routeUrlBlock[$i].' = '.' '.'<br/>';
+                    self::$params[$urlBlockOrignal]['OP'.$optionalParamNumber ] = (isset($urlBlock[$i])?$urlBlock[$i]:'');
                     self::$params[$urlBlockOrignal]['orignal'] = $routeUrlBlockOrignal;
-                    //echo "Add Complete ... <br/>";
+                    $optionalParamNumber ++;
+                }else{
+                    /* Proper Matching */
+                    //$urlBlock[$i] = (isset($urlBlock[$i])?$urlBlock[$i]:'');
+                    if (self::matchUrlBlock($urlBlock[$i], $routeUrlBlock[$i]) == 2) {
+                        //echo "ADDED: ".$routeUrlBlock[$i].' = '.$urlBlock[$i].'<br/>';
+                        self::$params[$urlBlockOrignal][$routeUrlBlock[$i]] = $urlBlock[$i];
+                        self::$params[$urlBlockOrignal]['orignal'] = $routeUrlBlockOrignal;
+                        //echo "Add Complete ... <br/>";
+                    }
                 }
             }
         }

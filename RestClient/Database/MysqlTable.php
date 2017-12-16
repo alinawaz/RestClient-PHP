@@ -242,12 +242,15 @@ class MysqlTable {
                     $values = $values . ",'" . $value . "'";
                 }
             }
-            DB::Query("insert into `" . Table::$tableName . "` (" . $columns . ") values (" . $values . ");");
-            $id = mysql_insert_id();
+            DB::Query("insert into `" . MysqlTable::$tableName . "` (" . $columns . ") values (" . $values . ");");
+            $id = mysqli_insert_id();
+            self::resetQueryBuilder();
             return $id;
         } else {
+            self::resetQueryBuilder();
             return false;
         }
+        self::resetQueryBuilder();
         return false;
     }
 
@@ -269,12 +272,15 @@ class MysqlTable {
                     $matches = $matches . " and " . $key . "='" . $value . "'";
                 }
             }
-            $tempQuery = "update `" . Table::$tableName . "` set " . $updates . " where " . $matches;
+            $tempQuery = "update `" . MysqlTable::$tableName . "` set " . $updates . " where " . $matches;
             $response = DB::Query($tempQuery);
+            self::resetQueryBuilder();
             return $response;
         } else {
+            self::resetQueryBuilder();
             return false;
         }
+        self::resetQueryBuilder();
         return false;
     }
 
@@ -288,16 +294,34 @@ class MysqlTable {
                     $matches = $matches . " and " . $key . "='" . $value . "'";
                 }
             }
-            $response = DB::Query("delete from `" . Table::$tableName . "` where " . $matches);
+            $queryString = "delete from `" . MysqlTable::$tableName . "` where " . $matches;
+            $response = DB::Query($queryString);
+            self::resetQueryBuilder();
             return $response;
         } else {
+            self::resetQueryBuilder();
             return false;
         }
+        self::resetQueryBuilder();
         return false;
+    }
+
+    public static function getPK(){
+        $key = '';
+        $pkQuery = DB::Query("SHOW KEYS FROM entries WHERE Key_name = 'PRIMARY'");
+        if($pkQuery){
+            while ($data = mysqli_fetch_assoc($pkQuery)) {
+                $key = $data['Column_name'];
+                break;
+            }
+        }
+        self::resetQueryBuilder();
+        return $key;
     }
 
     public static function truncate() {
         DB::Query("truncate table `" . MysqlTable::$tableName . "`");
+        self::resetQueryBuilder();
         return true;
     }
 

@@ -1,44 +1,35 @@
 <?php
+/* Required Files, Donot Changes Anything */
+require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/RestClient/Helper.php';
 
-$args = $_SERVER['argv'];
+use RestClient\Cli;
 
-if($args[1]=='help'){
-	echo "\nCREATE\n\n create controller <controller_name>\n";
-	echo "create q-controller <controller_name>\n";
-	echo "\n";
+Cli::catch();
+
+// Help
+if(Cli::get()=='help'){
+	Cli::log('Create\n\ncreate <controller|q-controller> <controller_name>');
 }
 
-// Create Commands
-if($args[1]=='create'){
-	if($args[2]=='controller'){
-		$controllerName = $args[3];
-		$template = 'Storage/templates/controller_template.php';
-		$templateContent = file_get_contents($template);
-		$templateContent = str_replace("<controller_name>", $controllerName.'Controller', $templateContent);
-		$templateContent = str_replace("<return>", '', $templateContent);
-		writeFile('Controllers/'.$controllerName.'Controller.php',$templateContent);
-		echo "\nController created successfully!\n\n";
-	}
-	if($args[2]=='q-controller'){
-		$controllerName = $args[3];
-		// Controller Templating
-		$template = 'Storage/templates/controller_template.php';
-		$templateContent = file_get_contents($template);
-		$templateContent = str_replace("<controller_name>", $controllerName.'Controller', $templateContent);
-		$templateContent = str_replace("<return>", 'return $'.'this->view("'.$controllerName.'");', $templateContent);
-		writeFile('Controllers/'.$controllerName.'Controller.php',$templateContent);
-		// View Templating
-		writeFile('Views/'.$controllerName.'.php',"<h1>".$controllerName."</h1>");
-		// Routing
-		$currentRoutes = $templateContent = file_get_contents('Config/routes.php');
-		$currentRoutes .= "\n\n /* GENERATED */ \nrouter::get('".$controllerName."', '".$controllerName."Controller@index');";
-		writeFile('Config/routes.php',$currentRoutes);
-		echo "\nQuick Controller created successfully!\n\n";
-	}
+// Create Controller
+if($name = Cli::match('create controller ?')){
+	$template = Cli::loadTemplate('controller','controller_template',array(
+		'<controller_name>' => $name[0].'Controller',
+		'<return>' => ''
+	));
+	Cli::write('controller',$name[0], $template);
+	Cli::log('Controller Created Successfully!');
 }
 
-function writeFile($filename,$content){
-	$file = fopen($filename ,"w");
-	fwrite($file,$content);
-	fclose($file);
+// Create Quick Controller
+if($name = Cli::match('create quick controller ?')){
+	$template = Cli::loadTemplate('controller','controller_template',array(
+		'<controller_name>' => trim($name[0]).'Controller',
+		'<return>' => 'return $'.'this->view("'.trim($name[0]).'");'
+	));
+	Cli::write('controller',$name[0], $template);
+	Cli::write('view',$name[0],'<h1> '.$name[0].' </h1>');
+	Cli::update('routes',"router::get('".trim($name[0])."', '".trim($name[0])."Controller@index');");
+	Cli::log('Controller Created Successfully!');
 }

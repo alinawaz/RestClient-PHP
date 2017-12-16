@@ -11,6 +11,10 @@ class ComposerStaticInit70e2c8cd06d79f4ea37a07f591785a7c
         array (
             'RestClient\\' => 11,
         ),
+        'M' => 
+        array (
+            'Models\\' => 7,
+        ),
         'C' => 
         array (
             'Controllers\\' => 12,
@@ -22,6 +26,10 @@ class ComposerStaticInit70e2c8cd06d79f4ea37a07f591785a7c
         'RestClient\\' => 
         array (
             0 => __DIR__ . '/../..' . '/RestClient',
+        ),
+        'Models\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Models',
         ),
         'Controllers\\' => 
         array (

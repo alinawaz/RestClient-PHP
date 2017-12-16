@@ -39,11 +39,12 @@ class Request {
 	}
 
 	public function redirect($url){
-		header('Location: '.$url);
+		header('Location: '.Config::$baseUrl.'/'.$url);
 	}
 
 	public function redirectBack(){
-		header('Location: ' . $_SERVER['HTTP_REFERER']);
+		if(isset($_SERVER['HTTP_REFERER']))
+			header('Location: ' . $_SERVER['HTTP_REFERER']);
 	}
 
 	public function response($data){
@@ -141,6 +142,14 @@ class Request {
 			}
 		}
 		// Outputting into file
+		$fileArray = explode('/',$viewFile);
+		if(count($fileArray)>0){
+			for($i=0;$i<count($fileArray)-1;$i++){
+				if (!file_exists('Storage/temp/views/'.$fileArray[$i])) {
+    				mkdir('Storage/temp/views/'.$fileArray[$i], 0777);
+				}
+			}
+		}
 		$actualFile = 'Storage/temp/views/' . $viewFile . "~temp.php";
 		// Re-rendering view
 		self::renderViewToFile($actualFile,$output);

@@ -4,7 +4,8 @@
         "psr-4": {
             "RestClient\\": "RestClient/",
             "Controllers\\": "Controllers/",
-            "Config\\": "Config/"
+            "Config\\": "Config/",
+            "Models\\": "Models/"
         }
     }
 }
