@@ -12,6 +12,15 @@ if(Cli::get()=='help'){
 	Cli::log('Create\n\ncreate <controller|q-controller> <controller_name>');
 }
 
+// migrations
+if($name = Cli::match('migrate ?')){
+	$name = trim($name[0]);
+	require __DIR__ . '/Data/Migrations/'.$name.'.php';
+	$migrationClass = new $name();
+	$migrationClass->up();
+	Cli::log($name.' Migrated Successfully!');
+}
+
 // Create Controller
 if($name = Cli::match('create controller ?')){
 	$template = Cli::loadTemplate('controller','controller_template',array(
