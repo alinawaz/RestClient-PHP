@@ -5,7 +5,7 @@ require __DIR__ . '/RestClient/Helper.php';
 
 use RestClient\Cli;
 
-Cli::catch();
+Cli::capture();
 
 // Help
 if(Cli::get()=='help'){
@@ -13,12 +13,20 @@ if(Cli::get()=='help'){
 }
 
 // migrations
-if($name = Cli::match('migrate ?')){
+if($name = Cli::match('migrate:table ?')){
 	$name = trim($name[0]);
-	require __DIR__ . '/Data/Migrations/'.$name.'.php';
-	$migrationClass = new $name();
+	$class = "\\Data\\Migrations\\".$name;
+	$migrationClass = new $class;
 	$migrationClass->up();
 	Cli::log($name.' Migrated Successfully!');
+}
+
+if($name = Cli::match('migrate:rollback ?')){
+	$name = trim($name[0]);
+	$class = "\\Data\\Migrations\\".$name;
+	$migrationClass = new $class;
+	$migrationClass->down();
+	Cli::log($name.' Rollbacked Successfully!');
 }
 
 // Create Controller

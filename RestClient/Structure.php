@@ -6,8 +6,8 @@ class Structure {
 
 	private $queryString = '';
 
-	function __toString(){
-		return $this->queryString;
+	public function getQuery(){
+		return rtrim(trim($this->queryString),",");
 	}
 
 	public function increments($columnName){

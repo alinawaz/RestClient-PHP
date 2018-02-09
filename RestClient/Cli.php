@@ -34,7 +34,7 @@ class Cli{
 	 *
 	 */
 	
-	public static function catch(){
+	public static function capture(){
 		self::$arguments = $_SERVER['argv'];
 	}
 

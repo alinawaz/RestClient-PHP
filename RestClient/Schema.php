@@ -11,8 +11,16 @@ class Schema extends Mysql {
 
 	public static function create($tableName, $structureQuery){
 		self::$tableName = $tableName;
-		self::$structureQuery = $structureQuery;
-		dd($structureQuery);
+		$structure = new Structure;
+		$structureQuery($structure);
+		self::$structureQuery = $structure->getQuery();
+		self::Query("CREATE TABLE ".self::$tableName." ( ".self::$structureQuery." )");
+		//dd("CREATE TABLE ".self::$tableName." ( ".self::$structureQuery." )");
+	}
+
+	public static function drop($tableName){
+		self::$tableName = $tableName;
+		self::Query("DROP TABLE ".self::$tableName);
 	}
 
 }
