@@ -12,7 +12,7 @@ class Entry {
 		Schema::create('entries',function(Structure $structure){
 			$structure->increments('id');
 			$structure->string('title');
-			$structure->number('status');
+			$structure->boolean('status');
 		});
 
 	}

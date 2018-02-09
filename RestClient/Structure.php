@@ -22,4 +22,9 @@ class Structure {
 		$this->queryString = $this->queryString . $columnName . ' INT('.$length.'), ';
 	}
 
+	public function boolean($columnName, $length=1) {
+		$this->queryString .= $columnName . " TINYINT({$length})";
+	}
+
+
 }
