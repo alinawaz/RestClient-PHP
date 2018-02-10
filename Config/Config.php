@@ -4,7 +4,7 @@ namespace Config;
 
 Class Config {
 
-	public static $baseUrl = 'http://localhost/restclient';
+	public static $baseUrl = 'http://restclient-php.test';
 
 	public static $viewFolder = 'Views';
 

@@ -11,4 +11,4 @@ require __DIR__ . '/Config/routes.php';
 
 // set_error_handler("errorHanldingCallback");
 
-RestClient\Router::run($_REQUEST['request']);
+RestClient\Router::run($_SERVER['REQUEST_URI']);

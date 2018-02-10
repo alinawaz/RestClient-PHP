@@ -16,6 +16,7 @@ class Router extends ErrorHandling {
     }
 
     public static function run($url) {
+        $url = (substr($url,0,1)=='/'?ltrim($url,'/'):$url);// Empty Slash Fix
         if (self::isRoute($url)) {
             if (self::isString($url)) {
                 self::handleString($url);

@@ -1,10 +1,10 @@
 <?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?><html>
   <head>
     <title>Welcome</title>
-    <link href="http://localhost/restclient/Assets/bootstrap.css" rel="stylesheet"/>
-    <script src="http://localhost/restclient/Assets/jquery.js" type="text/javascript"></script>
-    <script src="http://localhost/restclient/Assets/popper.js" type="text/javascript"></script>
-    <script src="http://localhost/restclient/Assets/bootstrap.js" type="text/javascript"></script>
+    <link href="http://restclient-php.test/Assets/bootstrap.css" rel="stylesheet"/>
+    <script src="http://restclient-php.test/Assets/jquery.js" type="text/javascript"></script>
+    <script src="http://restclient-php.test/Assets/popper.js" type="text/javascript"></script>
+    <script src="http://restclient-php.test/Assets/bootstrap.js" type="text/javascript"></script>
   </head>
   <body>
     <div class="jumbotron">
