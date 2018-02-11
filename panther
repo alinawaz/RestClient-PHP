@@ -1,64 +1,17 @@
 #!/usr/bin/env php
 <?php
 /* Required Files, Donot Changes Anything */
-require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/system/helper.php';
+require __DIR__ . '/vendor/autoload.php';
 
-use System\Cli;
-use System\Console;
+use Symfony\Component\Console\Application;
 
-Cli::capture();
+$application = new Application();
 
-// Help
-if(Cli::get()=='help'){
-	Cli::log('Create\n\ncreate <controller|q-controller> <controller_name>');
-}
+$application->add(new \System\Cli\Panther\Commands\ControllerCommand);
+$application->add(new \System\Cli\Panther\Commands\ModelCommand);
+$application->add(new \System\Cli\Panther\Commands\MigrationCommand);
+$application->add(new \System\Cli\Panther\Commands\MigrateCommand);
+$application->add(new \System\Cli\Panther\Commands\MigrateRollbackCommand);
 
-// migrations
-if($name = Cli::match('migrate:table ?')){
-	$name = trim($name[0]);
-	$class = "\\Src\\Data\\Migrations\\".$name;
-	$migrationClass = new $class;
-	$migrationClass->up();
-	Console::log('Table `'.$name.'` migrated successfully!','black',true,'light_gray',true);
-}
-
-if($name = Cli::match('migrate:rollback ?')){
-	$name = trim($name[0]);
-	$class = "\\Src\\Data\\Migrations\\".$name;
-	$migrationClass = new $class;
-	$migrationClass->down();
-	Console::log('Table `'.$name.'` REMOVED successfully!','black',true,'light_gray',true);
-}
-
-// Create Controller
-if($name = Cli::match('create controller ?')){
-	$template = Cli::loadTemplate('controller','controller_template',array(
-		'<controller_name>' => $name[0].'Controller',
-		'<return>' => ''
-	));
-	Cli::write('controller',$name[0], $template);
-	Console::log('Controller `'.$name[0].'` created successfully!','black',true,'light_gray',true);
-}
-
-// Create Quick Controller
-if($name = Cli::match('create quick controller ?')){
-	$template = Cli::loadTemplate('controller','controller_template',array(
-		'<controller_name>' => trim($name[0]).'Controller',
-		'<return>' => 'return $'.'this->view("'.trim($name[0]).'");'
-	));
-	Cli::write('controller',$name[0], $template);
-	Cli::write('view',$name[0],'<h1> '.$name[0].' </h1>');
-	Cli::update('routes',"router::get('".trim($name[0])."', '".trim($name[0])."Controller@index');");
-	Console::log('Controller `'.$name[0].'` created successfully!','black',true,'light_gray',true);
-}
-
-// Create Migration
-if($name = Cli::match('make:migration ? --table=?')){
-	$template = Cli::loadTemplate('migration','migration_template',array(
-		'<migration_name>' => $name[0],
-		'<table_name>' => $name[1]
-	));
-	Cli::write('migration',$name[0], $template);
-	Console::log('Migration `'.$name[0].'` created successfully!','black',true,'light_gray',true);
-}
+$application->run();

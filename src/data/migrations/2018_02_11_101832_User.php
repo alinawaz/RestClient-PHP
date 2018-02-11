@@ -5,11 +5,11 @@ namespace Src\Data\Migrations;
 use System\Database\Migrations\Schema;
 use System\Database\Migrations\Structure;
 
-class test {
+class User {
 
 	public function up(){
 
-		Schema::create('tests',function(Structure $structure){
+		Schema::create('users',function(Structure $structure){
 
 			$structure->increments('id');
 			
@@ -21,7 +21,7 @@ class test {
 
 	public function down(){
 
-		Schema::drop('tests');
+		Schema::drop('users');
 
 	}
 
