@@ -2,11 +2,9 @@
     "name": "RestClient",
     "autoload": {
         "psr-4": {
-            "RestClient\\": "RestClient/",
-            "Controllers\\": "Controllers/",
-            "Config\\": "Config/",
-            "Models\\": "Models/",
-            "Data\\": "Data/"
+            "System\\": "system/",
+            "Src\\": "src/",
+            "Config\\": "config/"
         }
     }
 }

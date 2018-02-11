@@ -1,8 +1,8 @@
 <?php
 /* Required Files, Donot Changes Anything */
 require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/RestClient/Helper.php';
-require __DIR__ . '/Config/routes.php';
+require __DIR__ . '/system/helper.php';
+require __DIR__ . '/src/routes.php';
 
 /* Error Handling, Request Routing, Donot Change Anything */
 // function errorHanldingCallback($errno, $errstr, $errfile, $errline){
@@ -11,4 +11,4 @@ require __DIR__ . '/Config/routes.php';
 
 // set_error_handler("errorHanldingCallback");
 
-RestClient\Router::run($_SERVER['REQUEST_URI']);
+System\Routing\Router::run($_SERVER['REQUEST_URI']);

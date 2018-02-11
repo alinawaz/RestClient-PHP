@@ -2,7 +2,7 @@
 
 namespace Controllers;
 
-use RestClient\Request;
+use System\Request;
 
 class <controller_name> extends Request {
 

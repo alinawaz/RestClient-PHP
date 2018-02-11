@@ -1,10 +1,10 @@
-<?php use RestClient\Libs\Lang; use RestClient\Libs\URL; ?><html>
+<?php use System\Libs\Lang; use System\Libs\URL; ?><html>
   <head>
     <title>Welcome</title>
-    <link href="http://restclient-php.test/Assets/bootstrap.css" rel="stylesheet"/>
-    <script src="http://restclient-php.test/Assets/jquery.js" type="text/javascript"></script>
-    <script src="http://restclient-php.test/Assets/popper.js" type="text/javascript"></script>
-    <script src="http://restclient-php.test/Assets/bootstrap.js" type="text/javascript"></script>
+    <link href="http://restclient-php.test/public/css/bootstrap.css" rel="stylesheet"/>
+    <script src="http://restclient-php.test/public/js/jquery.js" type="text/javascript"></script>
+    <script src="http://restclient-php.test/public/js/popper.js" type="text/javascript"></script>
+    <script src="http://restclient-php.test/public/js/bootstrap.js" type="text/javascript"></script>
   </head>
   <body>
     <div class="jumbotron">
@@ -27,6 +27,7 @@
           </div>
         </div>
       </p>
+      <a href="<?php echo URL::to('todo'); ?>" class="btn btn-primary">TODO Example</a>
     </div>
   </body>
 </html>
